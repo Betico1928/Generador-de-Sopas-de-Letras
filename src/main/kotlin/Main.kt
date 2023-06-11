@@ -1,5 +1,6 @@
 import java.awt.Color
 import java.awt.Font
+import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
@@ -22,8 +23,6 @@ fun main()
 
     // Crear la sopa de letras
     val sopaDeLetras = crearSopaDeLetras(palabras)
-
-
 
     // Mostrar la sopa de letras en consola con palabras resaltadas en rojo
     println("Sopa de Letras:")
@@ -170,41 +169,41 @@ fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
     val g2d = imagen.createGraphics()
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
+    g2d.font = Font("Roboto", Font.TRUETYPE_FONT, 15)
+
     // Rellenar fondo blanco
     g2d.color = Color.WHITE
     g2d.fillRect(0, 0, anchoImagen, altoImagen)
 
-
-    // Dibujar letras en celdas
+    // Dibujar letras
+    g2d.color = Color.BLACK
     for (i in sopaDeLetras.indices)
     {
         for (j in sopaDeLetras[i].indices)
         {
             val letra = sopaDeLetras[i][j]
 
+            val letraMayuscula = letra.uppercaseChar()
+            val x = j * anchoCelda + 10
+            val y = i * altoCelda + 20
 
-            val x = j * anchoCelda
-            val y = i * altoCelda
-
-            g2d.color = Color.BLACK
-            g2d.drawRect(x, y, anchoCelda, altoCelda)
-
-            g2d.font = Font("Arial", Font.BOLD, 14)
-
-
-            val metrics = g2d.fontMetrics
-            val anchoLetra = metrics.stringWidth(letra.toString())
-            val altoLetra = metrics.height
-
-            val xTexto = x + (anchoCelda - anchoLetra) / 2
-            val yTexto = y + (altoCelda + altoLetra) / 2
-
-            g2d.color = Color.BLACK
-            g2d.drawString(letra.toString(), xTexto, yTexto)
+            g2d.drawString(letraMayuscula.toString(), x, y)
         }
     }
 
-    g2d.dispose()
+    // Dibujar líneas de la cuadrícula
+    g2d.color = Color.GRAY
+    for (i in 0..sopaDeLetras.size)
+    {
+        val x = i * anchoCelda
+        g2d.drawLine(x, 0, x, altoImagen)
+    }
+    for (i in 0..sopaDeLetras[0].size)
+    {
+        val y = i * altoCelda
+        g2d.drawLine(0, y, anchoImagen, y)
+    }
 
+    g2d.dispose()
     return imagen
 }
