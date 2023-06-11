@@ -1,6 +1,5 @@
 import java.awt.Color
 import java.awt.Font
-import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.File
@@ -21,19 +20,19 @@ fun main()
     }
 
 
-
     // Crear la sopa de letras
     val sopaDeLetras = crearSopaDeLetras(palabras)
 
 
 
-    // Mostrar la sopa de letras en consola
+    // Mostrar la sopa de letras en consola con palabras resaltadas en rojo
     println("Sopa de Letras:")
     for (fila in sopaDeLetras)
     {
         for (letra in fila)
         {
-            print("$letra ")
+            val letraResaltada = if (letra.isUpperCase()) "\u001B[31m$letra\u001B[0m" else letra
+            print("$letraResaltada ")
         }
         println()
     }
@@ -125,7 +124,7 @@ fun colocarPalabra(fila: Int, columna: Int, direccion: Int, palabra: String, sop
         val nuevaFila = obtenerNuevaFila(fila, direccion, i)
         val nuevaColumna = obtenerNuevaColumna(columna, direccion, i)
 
-        sopaDeLetras[nuevaFila][nuevaColumna] = letra
+        sopaDeLetras[nuevaFila][nuevaColumna] = if (i == 0) letra.uppercaseChar() else letra.lowercaseChar()
     }
 }
 
@@ -159,8 +158,6 @@ fun obtenerLetraAleatoria(): Char
     return letras.random()
 }
 
-
-
 fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
 {
     val anchoCelda = 30
@@ -171,14 +168,11 @@ fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
 
     val imagen = BufferedImage(anchoImagen, altoImagen, BufferedImage.TYPE_INT_RGB)
     val g2d = imagen.createGraphics()
-
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-
 
     // Rellenar fondo blanco
     g2d.color = Color.WHITE
     g2d.fillRect(0, 0, anchoImagen, altoImagen)
-
 
 
     // Dibujar letras en celdas
@@ -188,6 +182,7 @@ fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
         {
             val letra = sopaDeLetras[i][j]
 
+
             val x = j * anchoCelda
             val y = i * altoCelda
 
@@ -195,6 +190,7 @@ fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
             g2d.drawRect(x, y, anchoCelda, altoCelda)
 
             g2d.font = Font("Arial", Font.BOLD, 14)
+
 
             val metrics = g2d.fontMetrics
             val anchoLetra = metrics.stringWidth(letra.toString())
