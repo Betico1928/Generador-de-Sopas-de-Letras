@@ -1,7 +1,4 @@
-import java.awt.Color
-import java.awt.Font
-import java.awt.Graphics2D
-import java.awt.RenderingHints
+import java.awt.*
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
@@ -42,7 +39,61 @@ fun main()
 
     ImageIO.write(imagenSopa, "png", archivoImagen)
     println("Se ha generado la imagen 'sopa_de_letras.png'.")
+
+    // Generar imagen de la lista de palabras
+    val imagenPalabras = generarImagenPalabras(palabras)
+    val archivoImagenPalabras = File("palabras.png")
+
+    ImageIO.write(imagenPalabras, "png", archivoImagenPalabras)
+    println("Se ha generado la imagen 'palabras.png'.")
 }
+
+fun generarImagenPalabras(palabras: List<String>): BufferedImage {
+    val anchoCelda = 200
+    val altoCelda = 30
+    val columnas = 2
+
+    val anchoImagen = columnas * anchoCelda
+    val altoImagen = (palabras.size / columnas) * altoCelda
+
+    val imagen = BufferedImage(anchoImagen, altoImagen, BufferedImage.TYPE_INT_ARGB)
+    val g2d = imagen.createGraphics()
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+    g2d.font = Font("Roboto", Font.TRUETYPE_FONT, 15)
+
+    // Dibujar palabras
+    g2d.color = Color.BLACK
+    for (i in palabras.indices) {
+        val palabra = palabras[i]
+        val columna = i / (palabras.size / columnas)
+        val x = columna * anchoCelda + 10
+        val y = (i % (palabras.size / columnas)) * altoCelda + 20
+
+        g2d.drawString(palabra, x, y)
+    }
+
+    // Dibujar líneas de la cuadrícula
+    g2d.color = Color.GRAY
+    for (i in 0..palabras.size / columnas) {
+        val y = i * altoCelda
+        g2d.drawLine(0, y, anchoImagen, y)
+    }
+    for (i in 0..columnas) {
+        val x = i * anchoCelda
+        g2d.drawLine(x, 0, x, altoImagen)
+    }
+
+    // Dibujar líneas de cierre
+    g2d.color = Color.BLACK
+    g2d.drawLine(0, altoImagen - 1, anchoImagen, altoImagen - 1) // línea inferior
+    g2d.drawLine(anchoImagen - 1, 0, anchoImagen - 1, altoImagen) // línea derecha
+
+    g2d.dispose()
+    return imagen
+}
+
+
 
 fun crearSopaDeLetras(palabras: List<String>): Array<Array<Char>>
 {
@@ -157,30 +208,23 @@ fun obtenerLetraAleatoria(): Char
     return letras.random()
 }
 
-fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
-{
+fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage {
     val anchoCelda = 30
     val altoCelda = 30
 
     val anchoImagen = sopaDeLetras.size * anchoCelda
     val altoImagen = sopaDeLetras[0].size * altoCelda
 
-    val imagen = BufferedImage(anchoImagen, altoImagen, BufferedImage.TYPE_INT_RGB)
+    val imagen = BufferedImage(anchoImagen, altoImagen, BufferedImage.TYPE_INT_ARGB)
     val g2d = imagen.createGraphics()
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
     g2d.font = Font("Roboto", Font.TRUETYPE_FONT, 15)
 
-    // Rellenar fondo blanco
-    g2d.color = Color.WHITE
-    g2d.fillRect(0, 0, anchoImagen, altoImagen)
-
     // Dibujar letras
     g2d.color = Color.BLACK
-    for (i in sopaDeLetras.indices)
-    {
-        for (j in sopaDeLetras[i].indices)
-        {
+    for (i in sopaDeLetras.indices) {
+        for (j in sopaDeLetras[i].indices) {
             val letra = sopaDeLetras[i][j]
 
             val letraMayuscula = letra.uppercaseChar()
@@ -193,17 +237,22 @@ fun generarImagenSopaDeLetras(sopaDeLetras: Array<Array<Char>>): BufferedImage
 
     // Dibujar líneas de la cuadrícula
     g2d.color = Color.GRAY
-    for (i in 0..sopaDeLetras.size)
-    {
+    for (i in 0 until sopaDeLetras.size) {
         val x = i * anchoCelda
         g2d.drawLine(x, 0, x, altoImagen)
     }
-    for (i in 0..sopaDeLetras[0].size)
-    {
+    for (i in 0 until sopaDeLetras[0].size) {
         val y = i * altoCelda
         g2d.drawLine(0, y, anchoImagen, y)
     }
 
+    // Dibujar líneas exteriores
+    g2d.color = Color.BLACK
+    g2d.stroke = BasicStroke(2f) // Ajusta el ancho de la línea
+    g2d.drawLine(0, altoImagen - 1, anchoImagen, altoImagen - 1) // línea inferior
+    g2d.drawLine(anchoImagen - 1, 0, anchoImagen - 1, altoImagen) // línea derecha
+
     g2d.dispose()
     return imagen
 }
+
