@@ -4,29 +4,28 @@ import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
 
-fun main()
-{
+fun main() {
     val palabras = mutableListOf<String>()
     val scanner = Scanner(System.`in`)
 
+    // Recibir el título
+    println("Ingresa el título:")
+    val titulo = scanner.nextLine().trim()
+
     // Recibir 10 palabras
     println("Ingresa 10 palabras:")
-    for (i in 1..10)
-    {
+    for (i in 1..10) {
         val palabra = scanner.next()
         palabras.add(palabra)
     }
-
 
     // Crear la sopa de letras
     val sopaDeLetras = crearSopaDeLetras(palabras)
 
     // Mostrar la sopa de letras en consola con palabras resaltadas en rojo
     println("Sopa de Letras:")
-    for (fila in sopaDeLetras)
-    {
-        for (letra in fila)
-        {
+    for (fila in sopaDeLetras) {
+        for (letra in fila) {
             val letraResaltada = if (letra.isUpperCase()) "\u001B[31m$letra\u001B[0m" else letra
             print("$letraResaltada ")
         }
@@ -35,18 +34,19 @@ fun main()
 
     // Generar imagen de la sopa de letras
     val imagenSopa = generarImagenSopaDeLetras(sopaDeLetras)
-    val archivoImagen = File("sopa_de_letras.png")
+    val archivoImagen = File("$titulo.png")
 
     ImageIO.write(imagenSopa, "png", archivoImagen)
-    println("Se ha generado la imagen 'sopa_de_letras.png'.")
+    println("Se ha generado la imagen '$titulo.png'.")
 
     // Generar imagen de la lista de palabras
     val imagenPalabras = generarImagenPalabras(palabras)
-    val archivoImagenPalabras = File("palabras.png")
+    val archivoImagenPalabras = File("${titulo}_solution.png")
 
     ImageIO.write(imagenPalabras, "png", archivoImagenPalabras)
-    println("Se ha generado la imagen 'palabras.png'.")
+    println("Se ha generado la imagen '${titulo}_solution.png'.")
 }
+
 
 fun generarImagenPalabras(palabras: List<String>): BufferedImage {
     val anchoCelda = 200
